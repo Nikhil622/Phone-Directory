@@ -1,0 +1,65 @@
+struct Trie{
+    map<char,Trie*>m;
+    bool isEnd;
+    Trie(){
+        isEnd=false;
+    }
+};
+
+void insert(Trie* root,string&s)
+{  Trie* curr=root;
+   for(auto x:s)
+    {  if(curr->m.find(x)==curr->m.end())
+          curr->m[x]=new Trie();
+       curr=curr->m[x];
+    }
+    curr->isEnd=true;
+}
+
+
+Trie* find(Trie* curr,char x)
+{  if(curr->m.find(x)==curr->m.end())
+         return NULL;
+   return curr->m[x]; 
+}
+
+void fun(Trie* t,string& s,vector<string>&res)
+{   if(t==NULL)
+      return;
+    if(t->isEnd==true)
+         res.push_back(s);
+    for(auto x:t->m)
+    {  s.push_back(x.first); 
+        fun(x.second,s,res);
+       s.pop_back();
+    }
+}
+class Solution{
+public:
+    vector<vector<string>> displayContacts(int n, string contact[], string &s)
+    {   vector<vector<string>> res;
+        Trie* root=new Trie();
+        Trie* prev=root;
+        for(int i=0;i<n;++i)
+          insert(root,contact[i]);
+        string str="";
+        for(int i=0;i<s.size();++i)
+        {  str+=s[i];
+           Trie* t=find(prev,s[i]);
+           prev=t;
+           if(t==NULL)
+           {   vector<string>vt;
+               vt.push_back("0");
+               for(int j=i;j<s.size();++j)
+               {  res.push_back(vt); }
+               break;
+           }
+           else{
+              vector<string>x;
+              fun(t,str,x);
+              res.push_back(x);
+           }
+        }
+        return res;
+    }
+};
